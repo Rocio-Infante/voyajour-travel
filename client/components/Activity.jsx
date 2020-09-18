@@ -1,13 +1,25 @@
 import React from 'react';
+import { BsX } from 'react-icons/bs';
 
-const Activity = ({ description, notes, address, link }) => (
-  <div id="Activity">
+const Activity = ({
+  description,
+  notes,
+  address,
+  link,
+  activityId,
+  userId,
+  removeActivityCard,
+}) => (
+  <div id='Activity'>
+    <div className='delete-icon' onClick={() => removeActivityCard(activityId)}>
+      <BsX />
+    </div>
     Description: {description}
-    <br/>
+    <br />
     Notes: {notes}
-    <br/>
+    <br />
     Address: {address}
-    <br/>
+    <br />
     Link: {link}
   </div>
 );

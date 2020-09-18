@@ -7,7 +7,7 @@ import { Link, Redirect } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
-import * as actions from '../actions/actions.js';
+import * as actions from '../actions/actions';
 
 // loginInput updates state with whatever is typed in the username or password inputs
 // validateLogin checks if a user is in the database and compares the inputted password
@@ -40,60 +40,62 @@ const Login = (props) => {
   } = props;
 
   // check if username and password are correct, if so redirect to /main
-  if (validated === true) return <Redirect to="/main" />;
+  if (validated === true) return <Redirect to='/main' />;
   // check if user has clicked login button, if so redirect to /signup
-  if (loginAttempts > 0) return <Redirect to="/signup" />;
+  if (loginAttempts > 0) return <Redirect to='/signup' />;
 
   return (
-    <Container>
-      <h1>Travelist</h1>
+    <Container fluid className='login-display'>
+      <div className='login-container'>
+        <h1>Voyajour</h1>
 
-      <Form noValidate>
-        <Form.Group controlId="username">
-          <Form.Label>Username</Form.Label>
-          <Form.Control
-            type="text"
-            placeholder="Username"
-            required
-            onChange={loginInput}
-          />
-          <Form.Control.Feedback type="invalid">
-            Incorrect Username
-          </Form.Control.Feedback>
-        </Form.Group>
+        <Form noValidate>
+          <Form.Group controlId='username'>
+            <Form.Label>Username</Form.Label>
+            <Form.Control
+              type='text'
+              placeholder='Username'
+              required
+              onChange={loginInput}
+            />
+            <Form.Control.Feedback type='invalid'>
+              Incorrect Username
+            </Form.Control.Feedback>
+          </Form.Group>
 
-        <Form.Group controlId="password">
-          <Form.Label>Password</Form.Label>
-          <Form.Control
-            type="password"
-            placeholder="Password"
-            required
-            onChange={loginInput}
-          />
-          <Form.Control.Feedback type="invalid">
-            Incorrect Password
-          </Form.Control.Feedback>
-        </Form.Group>
+          <Form.Group controlId='password'>
+            <Form.Label>Password</Form.Label>
+            <Form.Control
+              type='password'
+              placeholder='Password'
+              required
+              onChange={loginInput}
+            />
+            <Form.Control.Feedback type='invalid'>
+              Incorrect Password
+            </Form.Control.Feedback>
+          </Form.Group>
 
-        <Form.Group controlId="loginCheckbox">
-          <Form.Check type="checkbox" label="Remember me" />
-        </Form.Group>
+          <Form.Group controlId='loginCheckbox'>
+            <Form.Check type='checkbox' label='Remember me' />
+          </Form.Group>
 
-        <Button
-          className="mr-3"
-          variant="danger"
-          type="button"
-          onClick={() => validateLogin(username, password)}
-        >
-          Login
-        </Button>
-      </Form>
+          <Button
+            className='mr-3'
+            variant='primary'
+            type='button'
+            onClick={() => validateLogin(username, password)}
+          >
+            Login
+          </Button>
+        </Form>
 
-      <br />
-      <p className="text-center">
-        New user?&nbsp;
-        <Link to="/signup">Sign up here!</Link>
-      </p>
+        <br />
+        <p className='text-center'>
+          New user?&nbsp;
+          <Link to='/signup'>Sign up here!</Link>
+        </p>
+      </div>
     </Container>
   );
 };

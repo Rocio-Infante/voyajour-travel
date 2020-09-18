@@ -10,7 +10,10 @@ const mapDispatchToProps = (dispatch) => ({
   handleFormInput: (newState) => dispatch(actions.activityFormInput(newState)),
   handleFormSubmit: (newState) =>
     dispatch(actions.activityFormSubmit(newState)),
-  addToActivitiesArray: (activity) => dispatch(actions.addActivity(activity)),
+  addToActivitiesArray: (activity, userId) =>
+    dispatch(actions.storeNewActivity(activity, userId)),
+  removeActivityCard: (activityId, userId) =>
+    dispatch(actions.removeActivityCard(activityId, userId)),
 });
 
 const mapStateToProps = (state) => ({
@@ -19,7 +22,9 @@ const mapStateToProps = (state) => ({
   address: state.form.newActivity.address,
   link: state.form.newActivity.link,
   completed: state.form.newActivity.completed,
+  userId: state.form.activeUser.userId,
   activities: state.trips.activities,
+  activeLocationId: state.trips.activeLocationId,
 });
 
 const ActivitiesContainer = (props) => {
@@ -32,14 +37,18 @@ const ActivitiesContainer = (props) => {
     notes,
     address,
     link,
+    completed,
+    userId,
     handleFormInput,
     handleFormSubmit,
     addToActivitiesArray,
+    removeActivityCard,
     activities,
+    activeLocationId,
   } = props;
 
   return (
-    <div id="large-activity-container">
+    <div id='large-activity-container'>
       <ActivityFormModal
         show={showModal}
         onHide={() => setShowModal(false)}
@@ -47,22 +56,30 @@ const ActivitiesContainer = (props) => {
         notes={notes}
         address={address}
         link={link}
+        userId={userId}
         handleFormInput={handleFormInput}
         handleFormSubmit={handleFormSubmit}
         addActivity={addToActivitiesArray}
+        activeLocationId={activeLocationId}
       />
       <h1>Activities: </h1>
-      <div id="all-activities">
+      <div id='all-activities'>
         <Button onClick={() => setShowModal(true)}>Add Activity</Button>
-        {activities.map((el, i) => (
-          <Activity
-            key={`activity${i}`}
-            description={el.description}
-            notes={el.notes}
-            address={el.address}
-            link={el.link}
-          />
-        ))}
+        <div className='activity-pane'>
+          {activities.map((el, i) => (
+            <Activity
+              key={`activity${i}`}
+              activityId={el._id}
+              description={el.description}
+              notes={el.notes}
+              address={el.address}
+              link={el.link}
+              locationId={el.location_id}
+              userId={userId}
+              removeActivityCard={removeActivityCard}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );

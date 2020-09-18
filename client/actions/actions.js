@@ -14,15 +14,15 @@ const submitSignupForm = (formInput) => ({
 });
 
 // adds activity cards to the activity component container
-const getActivities = (tripId) => ({
+const getActivities = (locationId) => ({
   type: types.GET_ACTIVITIES,
-  payload: tripId,
+  payload: locationId,
 });
 
 // adds itinerary cards to the sideBar container
-const newPlans = (plans) => ({
-  type: types.NEW_PLANS,
-  payload: plans,
+const addNewLocation = (location) => ({
+  type: types.ADD_NEW_LOCATION,
+  payload: location,
 });
 
 const newLocationInput = (location) => ({
@@ -46,7 +46,7 @@ const activityFormInput = (formInput) => ({
 });
 
 const activityFormSubmit = (formInput) => ({
-  type: types.SUBMIT_ACTIVITY_FORM,
+  type: types.ACTIVITY_FORM_SUBMIT,
   payload: formInput,
 });
 
@@ -55,18 +55,81 @@ const addActivity = (newActivity) => ({
   payload: newActivity,
 });
 
+const deleteActivityCard = (activityId) => ({
+  type: types.DELETE_ACTIVITY_CARD,
+  payload: activityId,
+});
+
+const deleteLocationCard = (input) => ({
+  type: types.DELETE_LOCATION_CARD,
+  payload: input,
+});
+
 // this action checks username and password with sql database before dispatching action to reducers
 // use redux thunk in order to make an asyncronous fetch
 // Below is the same as writing const validateLogin = (u, p ) => {
 // return function(dispatch) { ... }
 // }
+
 const validateLogin = (username, password) => (dispatch) => {
-  axios.post('/api/user-validation', { username, password })
-    .then((response) => dispatch({
-      type: types.VALID_LOGIN,
-      payload: response.data,
-    }))
-    .catch((err) => console.log('Error in SUBMIT_LOGIN Reducer', err));
+  axios
+    .post('/api/user-validation', { username, password })
+    .then((response) => {
+      dispatch({ type: types.POPULATE_ACTIVITIES, payload: response.data });
+      dispatch({
+        type: types.VALID_LOGIN,
+        payload: response.data,
+      });
+    })
+    .catch((err) => console.log('Error in validate login thunk', err));
+};
+
+// send new location to db to be saved, pass return value (which will be location obj with userId added) to addNewLocation reducer func
+const storeNewLocation = (newLocationObj, userId) => (dispatch) => {
+  axios
+    .post(`/itinerary/newLocation/${userId}`, newLocationObj)
+    .then((res) => dispatch(addNewLocation(res.data)))
+    .catch((err) => console.log('error inside of storeNewLocation thunk', err));
+};
+
+// send new activity to db to be saved, pass return value (which will be activity obj with userId added) to ADD_ACTIVITIES in travelReducer func
+const storeNewActivity = (newActivityObj, userId) => (dispatch) => {
+  axios
+    .post(`itinerary/newActivity/${userId}`, newActivityObj)
+    .then((res) => {
+      dispatch(addActivity(res.data));
+    })
+    .catch((err) => {
+      console.log('error inside of storeNewActivity thunk', err);
+    });
+};
+
+// send location card to db to be saved, pass return value (which will be locationId) to DELETE_LOCATION_CARD in travelReducer func
+const removeActivityCard = (activityId) => (dispatch) => {
+  axios
+    // this endpoint will need to be updated when we know the correct endpoint
+    .delete(`itinerary/deleteActivity/${activityId}`)
+    .then(() => {
+      console.log(`about to dispatch ${activityId}`);
+      dispatch(deleteActivityCard(activityId));
+    })
+    .catch((err) => {
+      console.log('error inside of removeActivityCard thunk', err);
+    });
+};
+
+// send location card to db to be saved, pass return value (which will be locationId) to DELETE_LOCATION_CARD in travelReducer func
+const removeLocationCard = (locationId, userId) => (dispatch) => {
+  console.log(`locationID: ${locationId}, userId:${userId}`);
+  axios
+    // this endpoint will need to be updated when we know the correct endpoint
+    .delete(`itinerary/deleteLocation/${userId}/${locationId}`, { userId })
+    .then(() => {
+      dispatch(deleteLocationCard(locationId));
+    })
+    .catch((err) => {
+      console.log('error inside of removeLocationCard thunk', err);
+    });
 };
 
 export {
@@ -76,9 +139,15 @@ export {
   validateLogin,
   signupFormInput,
   getActivities,
-  newPlans,
+  addNewLocation,
   newLocationInput,
   activityFormInput,
   activityFormSubmit,
   addActivity,
+  removeActivityCard,
+  deleteActivityCard,
+  storeNewLocation,
+  storeNewActivity,
+  removeLocationCard,
+  deleteLocationCard,
 };
